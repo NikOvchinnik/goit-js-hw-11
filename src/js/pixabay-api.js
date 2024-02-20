@@ -1,4 +1,4 @@
-export  function searchImgs(imgName) {
+export function searchImgs(imgName) {
   const BASE_URL = 'https://pixabay.com';
   const END_POINT = '/api/?';
   const PARAMS = new URLSearchParams({

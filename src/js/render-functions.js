@@ -1,5 +1,5 @@
-import { refs } from "../main";
-import { simpleGallery } from "../main";
+import { refs } from '../main';
+import { simpleGallery } from '../main';
 
 export function renderImg(imgsObj) {
   const markup = imgsObj.hits

@@ -5,7 +5,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { searchImgs } from './js/pixabay-api';
 import { renderImg } from './js/render-functions';
 
-
 export const refs = {
   formElem: document.querySelector('.form-search'),
   listElem: document.querySelector('.gallery-list'),
@@ -37,7 +36,7 @@ function onSubmitForm(e) {
   searchImgs(userSearch)
     .then(data => {
       if (data.hits.length === 0) {
-        refs.listElem.innerHTML = "";
+        refs.listElem.innerHTML = '';
         return iziToast.show({
           message:
             'Sorry, there are no images matching your search query. Please try again!',
@@ -51,9 +50,7 @@ function onSubmitForm(e) {
       renderImg(data);
     })
     .catch(error => {
-      console.log(
-        'Error'
-      );
+      console.log('Error');
     })
     .finally(() => {
       loaderHide();
