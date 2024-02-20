@@ -1,69 +1,77 @@
-const refs = {
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import { searchImgs } from './js/pixabay-api';
+import { renderImg } from './js/render-functions';
+
+
+export const refs = {
   formElem: document.querySelector('.form-search'),
-  listElem: document.querySelector('.list-imgs'),
+  listElem: document.querySelector('.gallery-list'),
+  loaderElem: document.querySelector('.loader-container'),
 };
 
 refs.formElem.addEventListener('submit', onSubmitForm);
 
 function onSubmitForm(e) {
   e.preventDefault();
-  const userSearch = e.target.elements.image.value;
-  if (!userSearch) return;
+  const userSearch = e.target.elements.image.value.trim();
+  if (!userSearch) {
+    return iziToast.show({
+      title: 'Error',
+      titleColor: '#fff',
+      titleSize: '16',
+      titleLineHeight: '1.5',
+      message: 'Please, enter name of image',
+      messageColor: '#fff',
+      messageSize: '16',
+      messageLineHeight: '1.5',
+      backgroundColor: '#ef4040',
+      position: 'topRight',
+    });
+  }
 
-  searchImg(userSearch).then(data => {
-    renderImg(data)
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
-        refs.form.reset();
-      });
-  });
+  loaderShow();
+
+  searchImgs(userSearch)
+    .then(data => {
+      if (data.hits.length === 0) {
+        refs.listElem.innerHTML = "";
+        return iziToast.show({
+          message:
+            'Sorry, there are no images matching your search query. Please try again!',
+          messageColor: '#fff',
+          messageSize: '16',
+          messageLineHeight: '1.5',
+          backgroundColor: '#ef4040',
+          position: 'topRight',
+        });
+      }
+      renderImg(data);
+    })
+    .catch(error => {
+      console.log(
+        'Error'
+      );
+    })
+    .finally(() => {
+      loaderHide();
+      refs.formElem.reset();
+    });
 }
 
-function searchImg(imgName) {
-  const BASE_URL = 'https://pixabay.com';
-  const END_POINT = '/api/?';
-  const PARAMS = new URLSearchParams({
-    key: '42408042-b97fa2d9d3888df0f8d594195',
-    q: `${imgName}`,
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: 'true',
-  });
+const options = {
+  captionDelay: 250,
+  captionsData: 'alt',
+};
 
-  const url = BASE_URL + END_POINT + PARAMS;
+export const simpleGallery = new SimpleLightbox('.gallery-list a', options);
 
-  return fetch(url).then(res => res.json());
+function loaderHide() {
+  refs.loaderElem.classList.add('is-hidden');
 }
 
-function renderImg(img) {
-  console.dir(img);
-  const markup = `      <li class="item-img">
-        <img
-          src="https://png.pngtree.com/thumb_back/fw800/background/20230612/pngtree-images-of-winter-and-white-background-wallpapers-free-download-image_2935697.jpg"
-          alt="img"
-          width="360"
-          height="200"
-        />
-        <ul class="img-list-info">
-          <li>
-            <h2 class="img-title">Task 1</h2>
-            <p class="img-text">6666</p>
-          </li>
-          <li>
-            <h2 class="img-title">Task 2</h2>
-            <p class="img-text">7777</p>
-          </li>
-          <li>
-            <h2 class="img-title">Task 3</h2>
-            <p class="img-text">8888</p>
-          </li>
-          <li>
-            <h2 class="img-title">Task 4</h2>
-            <p class="img-text">9999</p>
-          </li>
-        </ul>
-      </li>`;
-  refs.listElem.insertAdjacentHTML('afterbegin', markup);
+function loaderShow() {
+  refs.loaderElem.classList.remove('is-hidden');
 }
